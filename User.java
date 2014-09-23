@@ -4,15 +4,17 @@ import java.net.*;
 class User 
 {
   public static int PORT = 9876;
+  public static int DATA_SIZE = 1024;
+  public static String CS_NAME = "localhost";
 
   public static void main(String args[]) throws Exception 
   {         
     BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
     DatagramSocket clientSocket = new DatagramSocket();
-    InetAddress IPAddress = InetAddress.getByName("localhost");
+    InetAddress IPAddress = InetAddress.getByName(CS_NAME);
 
-    byte[] sendData = new byte[1024];
-    byte[] receiveData = new byte[1024];
+    byte[] sendData = new byte[DATA_SIZE];
+    byte[] receiveData = new byte[DATA_SIZE];
     String sentence = inFromUser.readLine();
 
     sendData = sentence.getBytes();

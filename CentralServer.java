@@ -4,12 +4,13 @@ import java.net.*;
 class CentralServer 
 {
   public static int PORT = 9876;
+  public static int DATA_SIZE = 1024;
   
   public static void main(String args[]) throws Exception 
   {
     DatagramSocket serverSocket = new DatagramSocket(PORT);
-    byte[] receiveData = new byte[1024];
-    byte[] sendData = new byte[1024];      
+    byte[] receiveData = new byte[DATA_SIZE];
+    byte[] sendData = new byte[DATA_SIZE];      
 
     System.out.println("Starting UDP server at port " + PORT);
 
