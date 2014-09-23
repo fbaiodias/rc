@@ -28,19 +28,37 @@ class User
 
     byte[] sendData = new byte[DATA_SIZE];
     byte[] receiveData = new byte[DATA_SIZE];
-    String sentence = inFromUser.readLine();
 
-    sendData = sentence.getBytes();
+    while(true) {
+      String sentence = inFromUser.readLine();
 
-    DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, CS_PORT);
-    clientSocket.send(sendPacket);
+      if(sentence.equals("list")) {
+        sendData = new String("LST").getBytes();
 
-    DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-    clientSocket.receive(receivePacket);
+        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, CS_PORT);
+        clientSocket.send(sendPacket);
 
-    String modifiedSentence = new String(receivePacket.getData());
+        DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+        clientSocket.receive(receivePacket);
 
-    System.out.println("FROM SERVER:" + modifiedSentence);
+        String modifiedSentence = new String(receivePacket.getData());
+
+        System.out.println("LIST: " + modifiedSentence);
+      }
+      else if(sentence.equals("exit")) {
+        break;
+      }
+      else if(sentence.startsWith("retrieve")) {
+        System.out.println("RETRIEVE: "+sentence.substring(9));
+      }
+      else if(sentence.startsWith("upload")) {
+        System.out.println("UPLOAD: "+sentence.substring(7));
+      }
+      else {
+        System.out.println("UNKNOWN COMMAND");
+      }
+    }
+
     clientSocket.close();
   } 
 }
