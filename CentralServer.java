@@ -8,6 +8,14 @@ class CentralServer
   
   public static void main(String args[]) throws Exception 
   {
+    for (int i=0; i < args.length; i++) {
+      switch(args[i]) {
+        case "-p":
+          PORT = Integer.parseInt(args[i+1]);
+        break;
+      }
+    }
+
     DatagramSocket serverSocket = new DatagramSocket(PORT);
     byte[] receiveData = new byte[DATA_SIZE];
     byte[] sendData = new byte[DATA_SIZE];      
