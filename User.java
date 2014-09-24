@@ -29,11 +29,16 @@ class User
     byte[] sendData = new byte[DATA_SIZE];
     byte[] receiveData = new byte[DATA_SIZE];
 
+
+    Socket s = new Socket(CS_NAME, CS_PORT); 
+    DataInputStream input = new DataInputStream( s.getInputStream()); 
+    DataOutputStream output = new DataOutputStream( s.getOutputStream()); 
+
     while(true) {
       String sentence = inFromUser.readLine();
 
       if(sentence.equals("list")) {
-        sendData = new String("LST").getBytes();
+        sendData = new String("LST\n").getBytes();
 
         DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, CS_PORT);
         clientSocket.send(sendPacket);
@@ -53,6 +58,15 @@ class User
       }
       else if(sentence.startsWith("upload")) {
         System.out.println("UPLOAD: "+sentence.substring(7));
+
+        String message = "UPR "+sentence.substring(7)+"\n";
+        //Step 1 send length
+        System.out.println("Length"+ message.length());
+        output.writeInt(message.length());
+        //Step 2 send length
+        System.out.println("Writing: "+message);
+        output.writeBytes(message); // UTF is a string encoding
+
       }
       else {
         System.out.println("UNKNOWN COMMAND");
