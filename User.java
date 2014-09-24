@@ -9,8 +9,7 @@ class User
 
   public static void main(String args[]) throws Exception 
   {
-    int i = 0;
-    for (i=0; i < args.length; i++) {
+    for (int i=0; i < args.length; i++) {
       if(args[i].equals("-n")) {
         CS_NAME = args[i+1];
       } else if(args[i].equals("-p")) {
@@ -64,6 +63,16 @@ class User
         //Step 2 send length
         System.out.println("Writing: "+message);
         output.writeBytes(message); // UTF is a string encoding
+
+        //Step 1 read length
+        int nb = input.readInt();
+        byte[] digit = new byte[nb];
+        //Step 2 read byte
+        for(int i = 0; i < nb; i++)
+        digit[i] = input.readByte();
+      
+        String st = new String(digit);
+        System.out.println("Received: "+ st); 
 
       }
       else {
