@@ -9,14 +9,12 @@ class User
 
   public static void main(String args[]) throws Exception 
   {
-    for (int i=0; i < args.length; i++) {
-      switch(args[i]) {
-        case "-n":
-          CS_NAME = args[i+1];
-        break;
-        case "-p":
-          CS_PORT = Integer.parseInt(args[i+1]);
-        break;
+    int i = 0;
+    for (i=0; i < args.length; i++) {
+      if(args[i].equals("-n")) {
+        CS_NAME = args[i+1];
+      } else if(args[i].equals("-p")) {
+        CS_PORT = Integer.parseInt(args[i+1]);
       }
     }
 
