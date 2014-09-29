@@ -1,3 +1,5 @@
+package servers;
+
 import java.io.*;
 import java.net.*;
 
@@ -27,9 +29,20 @@ class User
     byte[] receiveData = new byte[DATA_SIZE];
 
 
-    Socket s = new Socket(CS_NAME, CS_PORT); 
-    DataInputStream input = new DataInputStream( s.getInputStream()); 
-    DataOutputStream output = new DataOutputStream( s.getOutputStream()); 
+    Socket s; 
+    DataInputStream input; 
+    DataOutputStream output; 
+    Boolean tcpStarted = false;
+    try {
+      s = new Socket(CS_NAME, CS_PORT); 
+      input = new DataInputStream( s.getInputStream()); 
+      output = new DataOutputStream( s.getOutputStream()); 
+
+      tcpStarted = true;
+      System.out.println("Connected to TCP server at "+CS_NAME+":"+CS_PORT);
+    } catch (Exception e) {
+      System.out.println("Failed to connect to TCP server at "+CS_NAME+":"+CS_PORT);
+    }
 
     while(true) {
       String sentence = inFromUser.readLine();
@@ -56,23 +69,23 @@ class User
       else if(sentence.startsWith("upload")) {
         System.out.println("UPLOAD: "+sentence.substring(7));
 
-        String message = "UPR "+sentence.substring(7)+"\n";
-        //Step 1 send length
-        System.out.println("Length"+ message.length());
-        output.writeInt(message.length());
-        //Step 2 send length
-        System.out.println("Writing: "+message);
-        output.writeBytes(message); // UTF is a string encoding
+        // String message = "UPR "+sentence.substring(7)+"\n";
+        // //Step 1 send length
+        // System.out.println("Length"+ message.length());
+        // output.writeInt(message.length());
+        // //Step 2 send length
+        // System.out.println("Writing: "+message);
+        // output.writeBytes(message); // UTF is a string encoding
 
-        //Step 1 read length
-        int nb = input.readInt();
-        byte[] digit = new byte[nb];
-        //Step 2 read byte
-        for(int i = 0; i < nb; i++)
-        digit[i] = input.readByte();
+        // //Step 1 read length
+        // int nb = input.readInt();
+        // byte[] digit = new byte[nb];
+        // //Step 2 read byte
+        // for(int i = 0; i < nb; i++)
+        // digit[i] = input.readByte();
       
-        String st = new String(digit);
-        System.out.println("Received: "+ st); 
+        // String st = new String(digit);
+        // System.out.println("Received: "+ st); 
 
       }
       else {
