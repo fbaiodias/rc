@@ -6,14 +6,15 @@ import java.net.*;
 public class UDPServer extends Thread {
 
   public static int DATA_SIZE = 1024;
-  public static int PORT = 9876;
+  public static int PORT = 9876;  
+  public static boolean IS_RUNNING = true;
 
   public UDPServer (int port) {
     PORT = port;
   }
 
   public void run() {
-
+	 
     try {
       DatagramSocket serverSocket = new DatagramSocket(PORT);
       byte[] receiveData = new byte[DATA_SIZE];
@@ -21,7 +22,7 @@ public class UDPServer extends Thread {
 
       System.out.println("UDP Server started at localhost:"+PORT);
 
-      while(true) 
+      while(IS_RUNNING) 
       {
         DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
         serverSocket.receive(receivePacket);
@@ -38,12 +39,19 @@ public class UDPServer extends Thread {
         DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
         serverSocket.send(sendPacket);
       }
+      
+      serverSocket.close();
     }
     catch (Exception e) {
       System.out.println("Failed to start UDP server at port " + PORT);
       System.out.println(e);
     }
   }
+  
+  public void close() {
+	IS_RUNNING = false;
+  }
+
 
   public static void main(String argv[]) {
     UDPServer udpServer = new UDPServer(58011);
