@@ -8,6 +8,8 @@ class User
   public static int CS_PORT = 9876;
   public static int DATA_SIZE = 1024;
   public static String CS_NAME = "localhost";
+  
+  public static DatagramSocket clientSocket;
 
   public static void main(String args[]) throws Exception 
   {
@@ -22,27 +24,17 @@ class User
     System.out.println("Connecting to UDP server at "+CS_NAME+":"+CS_PORT);
 
     BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
-    DatagramSocket clientSocket = new DatagramSocket();
+    clientSocket = new DatagramSocket();
     InetAddress IPAddress = InetAddress.getByName(CS_NAME);
 
     byte[] sendData = new byte[DATA_SIZE];
     byte[] receiveData = new byte[DATA_SIZE];
 
+    Socket s = new Socket(CS_NAME, CS_PORT); 
+    DataInputStream input = new DataInputStream( s.getInputStream()); 
+    DataOutputStream output = new DataOutputStream( s.getOutputStream()); 
 
-    Socket s; 
-    DataInputStream input; 
-    DataOutputStream output; 
-    Boolean tcpStarted = false;
-    try {
-      s = new Socket(CS_NAME, CS_PORT); 
-      input = new DataInputStream( s.getInputStream()); 
-      output = new DataOutputStream( s.getOutputStream()); 
-
-      tcpStarted = true;
-      System.out.println("Connected to TCP server at "+CS_NAME+":"+CS_PORT);
-    } catch (Exception e) {
-      System.out.println("Failed to connect to TCP server at "+CS_NAME+":"+CS_PORT);
-    }
+    System.out.println("Connected to TCP server at "+CS_NAME+":"+CS_PORT);
 
     while(true) {
       String sentence = inFromUser.readLine();
@@ -69,30 +61,48 @@ class User
       else if(sentence.startsWith("upload")) {
         System.out.println("UPLOAD: "+sentence.substring(7));
 
-        // String message = "UPR "+sentence.substring(7)+"\n";
-        // //Step 1 send length
-        // System.out.println("Length"+ message.length());
-        // output.writeInt(message.length());
-        // //Step 2 send length
-        // System.out.println("Writing: "+message);
-        // output.writeBytes(message); // UTF is a string encoding
+        String message = "UPR "+sentence.substring(7)+"\n";
+        output.writeBytes(message); // UTF is a string encoding
+        
+        byte[] digit = new byte[DATA_SIZE];
+        for(int i = 0; i < DATA_SIZE; i++) {
+        	digit[i] = input.readByte();
 
-        // //Step 1 read length
-        // int nb = input.readInt();
-        // byte[] digit = new byte[nb];
-        // //Step 2 read byte
-        // for(int i = 0; i < nb; i++)
-        // digit[i] = input.readByte();
-      
-        // String st = new String(digit);
-        // System.out.println("Received: "+ st); 
+        	if(digit[i] == '\n') {
+        		break;
+        	}
+        }
 
+        String st = new String(digit);
+        
+        if(st.startsWith("AWR")) {
+            String status = st.substring(4);
+            if(status.startsWith("dup")) {
+            	System.out.println("Duplicate file");
+            } else if(status.startsWith("new")) {
+            	System.out.println("Sending file");
+            	
+            	
+            	
+            	
+            	
+            } else {
+                System.out.println("Received: "+ st);             	
+            }
+        } else {
+            System.out.println("Received: "+ st); 
+        }
       }
       else {
         System.out.println("UNKNOWN COMMAND");
       }
     }
 
-    clientSocket.close();
+    Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+        public void run() {
+            System.out.println("In shutdown hook");
+            clientSocket.close();
+        }
+    }, "Shutdown-thread"));
   } 
 }

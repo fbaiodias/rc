@@ -18,20 +18,25 @@ public class TCPServer extends Thread {
       String clientSentence;
       String capitalizedSentence;
       ServerSocket welcomeSocket = new ServerSocket(PORT);
-
+      
+      
       System.out.println("TCP Server started at localhost:"+PORT);
 
+      Socket connectionSocket = welcomeSocket.accept();
+      BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
+      DataOutputStream outToClient = new DataOutputStream(connectionSocket.getOutputStream());
+
+      System.out.println("Client connected");
+
       while(IS_RUNNING) {
-        Socket connectionSocket = welcomeSocket.accept();
-        BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
-        DataOutputStream outToClient = new DataOutputStream(connectionSocket.getOutputStream());
         clientSentence = inFromClient.readLine();
+
         System.out.println("Received: " + clientSentence);
         capitalizedSentence = clientSentence.toUpperCase() + '\n';
-        outToClient.writeBytes(capitalizedSentence);
+        outToClient.writeBytes(capitalizedSentence);        
       }
       
-      welcomeSocket.close();
+      // welcomeSocket.close();
     }
     catch (Exception e) {
       System.out.println("Failed to start TCP server at port " + PORT);
