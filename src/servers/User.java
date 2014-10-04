@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 class User 
 {
-  public static int DATA_SIZE = 10024;
+  public static int DATA_SIZE = 133169152;
   public static int CS_PORT = 9876;
   public static String CS_NAME = "localhost";
   public static int portSS = -1;
@@ -117,12 +117,15 @@ class User
               fileData[j] = inputSS.readByte();
           }
           
-          System.out.println(fileSize);
-          System.out.println(new String(fileData));
+          // System.out.println(fileSize);
+          // System.out.println(new String(fileData));
           
-          FileOutputStream fileOutput = new FileOutputStream (fileName);
+          FileOutputStream fileOutput = new FileOutputStream ("files/"+fileName);
           fileOutput.write(fileData);
           fileOutput.close();
+          
+          System.out.println("File saved");
+          
         }
       else if(sentence.startsWith("upload")) {
         String fileName = sentence.substring(7);
