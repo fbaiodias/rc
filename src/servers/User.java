@@ -61,8 +61,8 @@ class User
 	        portSS = Integer.parseInt(parts[2]);
 	        
 	        ss = new Socket(IPSS, portSS); 
-	        inputSS = new DataInputStream( s.getInputStream()); 
-	        outputSS = new DataOutputStream( s.getOutputStream()); 
+	        inputSS = new DataInputStream( ss.getInputStream()); 
+	        outputSS = new DataOutputStream( ss.getOutputStream()); 
 	
 	        System.out.println("SS is located at " + IPSS + ":" + portSS);
 	
