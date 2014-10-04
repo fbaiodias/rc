@@ -35,6 +35,7 @@ class User
     Socket s = new Socket(CS_NAME, CS_PORT); 
     DataInputStream input = new DataInputStream( s.getInputStream()); 
     DataOutputStream output = new DataOutputStream( s.getOutputStream()); 
+    
     Socket ss = null;
     DataInputStream inputSS = null;
     DataOutputStream outputSS = null;
@@ -89,19 +90,37 @@ class User
           
           
           byte[] digit = new byte[DATA_SIZE];
-          for(int i = 0; i < DATA_SIZE; i++) {
+          int spaceCount = 0;
+          int fileSize;
+          
+          for(int i = 0; spaceCount < 2; i++) {
           	digit[i] = inputSS.readByte();
-
+          	
           	if(digit[i] == '\n') {
           		break;
           	}
+          	else if (digit[i] == ' ') {
+          		spaceCount++;
+          		if (spaceCount == 3) {
+          			String response = new String(digit);
+          			fileSize = Integer.parseInt(response.split(" ")[2]);
+          		}
+          	}
           }
-
+          
+          byte[] file = new byte[DATA_SIZE];
+          
+          for(int j=0; inputSS.available() != 0; j++) {
+        	  file[j] = inputSS.readByte();
+          }
+          
           String st = new String(digit);
+          String parts[] = st.split(" ", 4);
           System.out.println(st);
           
-          //FileOutputStream fileOutput = new FileOutputStream (sentence.substring(9), true);
-          //fileOutput.write(arg0);
+          FileOutputStream fileOutput = new FileOutputStream (sentence.substring(9));
+          fileOutput.write(file);
+          fileOutput.close();
         }
       else if(sentence.startsWith("upload")) {
         String fileName = sentence.substring(7);
