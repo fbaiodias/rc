@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 class User 
 {
-  public static int DATA_SIZE = 133169152;
+  public static int DATA_SIZE = 1024;
   public static int CS_PORT = 9876;
   public static String CS_NAME = "localhost";
   public static int portSS = -1;
@@ -101,6 +101,7 @@ class User
           	if(digit[i] == '\n') {
           		break;
           	}
+          	
           	else if (digit[i] == ' ') {
           		spaceCount++;
           		if (spaceCount == 3) {
@@ -111,9 +112,9 @@ class User
           }
           
           
-          byte[] fileData = new byte[DATA_SIZE];
+          byte[] fileData = new byte[fileSize];
           
-          for(int j=0; inputSS.available() != 0; j++) {
+          for(int j=0; j < fileSize; j++) {
               fileData[j] = inputSS.readByte();
           }
           
