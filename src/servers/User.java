@@ -2,6 +2,7 @@ package servers;
 
 import java.io.*;
 import java.net.*;
+import java.util.Arrays;
 
 class User 
 {
@@ -79,9 +80,10 @@ class User
         break;
       }
       else if(sentence.startsWith("retrieve")) {
-          System.out.println("RETRIEVE: "+sentence.substring(9));
+          String fileName = sentence.substring(9);
+          System.out.println("RETRIEVE: "+fileName);
           
-          String message = "REQ "+sentence.substring(9)+"\n";
+          String message = "REQ "+fileName+"\n";
           if (ss != null) {
           	outputSS.writeBytes(message); // UTF is a string encoding
           }
@@ -91,11 +93,11 @@ class User
           
           byte[] digit = new byte[DATA_SIZE];
           int spaceCount = 0;
-          int fileSize;
+          int fileSize = 0;
           
-          for(int i = 0; spaceCount < 2; i++) {
+          for(int i = 0; spaceCount < 3; i++) {
           	digit[i] = inputSS.readByte();
-          	
+            
           	if(digit[i] == '\n') {
           		break;
           	}
@@ -108,18 +110,18 @@ class User
           	}
           }
           
-          byte[] file = new byte[DATA_SIZE];
+          
+          byte[] fileData = new byte[DATA_SIZE];
           
           for(int j=0; inputSS.available() != 0; j++) {
-        	  file[j] = inputSS.readByte();
+              fileData[j] = inputSS.readByte();
           }
           
-          String st = new String(digit);
-          String parts[] = st.split(" ", 4);
-          System.out.println(st);
+          System.out.println(fileSize);
+          System.out.println(new String(fileData));
           
-          FileOutputStream fileOutput = new FileOutputStream (sentence.substring(9));
-          fileOutput.write(file);
+          FileOutputStream fileOutput = new FileOutputStream (fileName);
+          fileOutput.write(fileData);
           fileOutput.close();
         }
       else if(sentence.startsWith("upload")) {
@@ -132,7 +134,9 @@ class User
         String message = "UPR "+fileName+"\n";
         output.writeBytes(message); // UTF is a string encoding
         
-        byte[] digit = new byte[DATA_SIZE];
+    	System.out.println(new String(fileBytes));
+
+    	byte[] digit = new byte[DATA_SIZE];
         for(int i = 0; i < DATA_SIZE; i++) {
         	digit[i] = input.readByte();
         	
@@ -154,9 +158,11 @@ class User
             } else if(status.startsWith("new")) {
             	System.out.println("Sending file");
             	
-                message = "UPC "+fileBytes.length+" "+fileBytes+"\n";
-                output.writeBytes(message); // UTF is a string encoding
-            	System.out.println("File uploaded");
+                message = "UPC "+fileBytes.length+" ";
+                output.writeBytes(message);
+                output.write(fileBytes);
+                output.writeBytes("\n");
+                System.out.println("File uploaded");
             } else {
                 System.out.println("Received: "+ st);             	
             }
