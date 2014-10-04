@@ -50,7 +50,7 @@ class User
         DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
         clientSocket.receive(receivePacket);
 
-        String reply = new String(receivePacket.getData());
+        String reply = new String(receivePacket.getData()).split("\n")[0];
         
         if(reply.startsWith("AWL")) {
 	        String[] parts = reply.split(" ");
