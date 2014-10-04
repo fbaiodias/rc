@@ -35,6 +35,9 @@ class User
     Socket s = new Socket(CS_NAME, CS_PORT); 
     DataInputStream input = new DataInputStream( s.getInputStream()); 
     DataOutputStream output = new DataOutputStream( s.getOutputStream()); 
+    Socket ss = null;
+    DataInputStream inputSS = null;
+    DataOutputStream outputSS = null;
 
     System.out.println("Connected to TCP server at "+CS_NAME+":"+CS_PORT);
 
@@ -56,6 +59,10 @@ class User
 	        String[] parts = reply.split(" ");
 	        IPSS = parts[1];
 	        portSS = Integer.parseInt(parts[2]);
+	        
+	        ss = new Socket(IPSS, portSS); 
+	        inputSS = new DataInputStream( s.getInputStream()); 
+	        outputSS = new DataOutputStream( s.getOutputStream()); 
 	
 	        System.out.println("SS is located at " + IPSS + ":" + portSS);
 	
@@ -71,8 +78,31 @@ class User
         break;
       }
       else if(sentence.startsWith("retrieve")) {
-        System.out.println("RETRIEVE: "+sentence.substring(9));
-      }
+          System.out.println("RETRIEVE: "+sentence.substring(9));
+          
+          String message = "REQ "+sentence.substring(9)+"\n";
+          if (ss != null) {
+          	outputSS.writeBytes(message); // UTF is a string encoding
+          }
+          
+          System.out.println(message + " sent to " + ss.getInetAddress() + " or " + IPSS);
+          
+          
+          byte[] digit = new byte[DATA_SIZE];
+          for(int i = 0; i < DATA_SIZE; i++) {
+          	digit[i] = inputSS.readByte();
+
+          	if(digit[i] == '\n') {
+          		break;
+          	}
+          }
+
+          String st = new String(digit);
+          System.out.println(st);
+          
+          //FileOutputStream fileOutput = new FileOutputStream (sentence.substring(9), true);
+          //fileOutput.write(arg0);
+        }
       else if(sentence.startsWith("upload")) {
         String fileName = sentence.substring(7);
         
