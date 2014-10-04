@@ -5,7 +5,7 @@ import java.net.*;
 
 class User 
 {
-  public static int DATA_SIZE = 1024;
+  public static int DATA_SIZE = 10024;
   public static int CS_PORT = 9876;
   public static String CS_NAME = "localhost";
   public static int portSS = -1;
@@ -74,14 +74,20 @@ class User
         System.out.println("RETRIEVE: "+sentence.substring(9));
       }
       else if(sentence.startsWith("upload")) {
-        System.out.println("UPLOAD: "+sentence.substring(7));
-
-        String message = "UPR "+sentence.substring(7)+"\n";
+        String fileName = sentence.substring(7);
+        
+        byte[] fileBytes = readFile(fileName);
+        
+        // System.out.println("UPLOAD: "+fileName);
+        
+        String message = "UPR "+fileName+"\n";
         output.writeBytes(message); // UTF is a string encoding
         
         byte[] digit = new byte[DATA_SIZE];
         for(int i = 0; i < DATA_SIZE; i++) {
         	digit[i] = input.readByte();
+        	
+        	//System.out.print(digit[i]);
 
         	if(digit[i] == '\n') {
         		break;
@@ -90,6 +96,8 @@ class User
 
         String st = new String(digit);
         
+        // System.out.print(st);
+
         if(st.startsWith("AWR")) {
             String status = st.substring(4);
             if(status.startsWith("dup")) {
@@ -97,10 +105,9 @@ class User
             } else if(status.startsWith("new")) {
             	System.out.println("Sending file");
             	
-            	
-            	
-            	
-            	
+                message = "UPC "+fileBytes.length+" "+fileBytes+"\n";
+                output.writeBytes(message); // UTF is a string encoding
+            	System.out.println("File uploaded");
             } else {
                 System.out.println("Received: "+ st);             	
             }
@@ -120,4 +127,20 @@ class User
         }
     }, "Shutdown-thread"));
   } 
+
+  public static byte[] readFile(String filename) throws IOException {
+    try {
+      File file = new File(System.getProperty("user.dir") + "/files/" + filename);
+	  byte[] fileData = new byte[(int) file.length()];
+	  DataInputStream dis = new DataInputStream(new FileInputStream(file));
+	  dis.readFully(fileData);
+	  dis.close();
+	  
+	  System.out.println("Loaded the file");
+	  return fileData;
+    } catch (FileNotFoundException e) {
+      System.err.println("Couldn't find the file");
+	  return "nok".getBytes();
+	}
+  }
 }
