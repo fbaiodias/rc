@@ -5,9 +5,11 @@ import java.net.*;
 
 class User 
 {
-  public static int CS_PORT = 9876;
   public static int DATA_SIZE = 1024;
+  public static int CS_PORT = 9876;
   public static String CS_NAME = "localhost";
+  public static int portSS = -1;
+  public static String IPSS;
   
   public static DatagramSocket clientSocket;
 
@@ -48,9 +50,22 @@ class User
         DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
         clientSocket.receive(receivePacket);
 
-        String modifiedSentence = new String(receivePacket.getData());
-
-        System.out.println("LIST: " + modifiedSentence);
+        String reply = new String(receivePacket.getData());
+        
+        if(reply.startsWith("AWL")) {
+	        String[] parts = reply.split(" ");
+	        IPSS = parts[1];
+	        portSS = Integer.parseInt(parts[2]);
+	
+	        System.out.println("SS is located at " + IPSS + ":" + portSS);
+	
+	        int length = Integer.parseInt(parts[3]);
+	        for(int i=0; i<length; i++) {
+	        	System.out.println((i+1)+": "+parts[4+i]);
+	        }
+        } else {
+	        System.out.println("LIST: " + reply);	        
+        }
       }
       else if(sentence.equals("exit")) {
         break;
