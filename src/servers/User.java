@@ -62,9 +62,7 @@ class User
 	        IPSS = parts[1];
 	        portSS = Integer.parseInt(parts[2]);
 	        
-	        ss = new Socket(IPSS, portSS); 
-	        inputSS = new DataInputStream( ss.getInputStream()); 
-	        outputSS = new DataOutputStream( ss.getOutputStream()); 
+	        
 	
 	        System.out.println("SS is located at " + IPSS + ":" + portSS);
 	
@@ -80,6 +78,9 @@ class User
         break;
       }
       else if(sentence.startsWith("retrieve")) {
+    	  ss = new Socket(IPSS, portSS); 
+	      inputSS = new DataInputStream( ss.getInputStream()); 
+	      outputSS = new DataOutputStream( ss.getOutputStream()); 
           String fileName = sentence.substring(9);
           System.out.println("RETRIEVE: "+fileName);
           
@@ -124,7 +125,7 @@ class User
           FileOutputStream fileOutput = new FileOutputStream ("files/"+fileName);
           fileOutput.write(fileData);
           fileOutput.close();
-          
+                    
           System.out.println("File saved");
           
         }
@@ -182,7 +183,7 @@ class User
     Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
         public void run() {
             System.out.println("In shutdown hook");
-            clientSocket.close();
+            clientSocket.close();					
         }
     }, "Shutdown-thread"));
   } 
