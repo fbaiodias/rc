@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 
-public class TCPServer extends Thread {
+public class TCPServer extends Server {
 
   public static int PORT = 58011;
   public static boolean IS_RUNNING = true;
@@ -19,36 +19,7 @@ public class TCPServer extends Thread {
   public void run() {
 
     try {
-    	
-    	//ler ficheiros onde esta a informacao relativa aos SS
-        BufferedReader inServers = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/cs/servers.txt"));
-        BufferedReader inFiles = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/cs/files.txt"));
-        
-        String line;
-        
-        //le a lista de StorageServers
-        while (true) {
-      	  line = inServers.readLine();
-      	  if (line != null) {
-      		  serverList.add(line);
-      	  } else {
-      		  break;
-      	  }
-        }
-        
-        //le a lista de ficheiros
-        while (true) {
-      	  line = inFiles.readLine();
-      	  if (line != null) {
-      		  fileList.add(line);
-      	  } else {
-      		  break;
-      	  }
-        }
-        
-        inServers.close();
-        inFiles.close();
-    	
+
       String clientSentence;
       String capitalizedSentence;
       ServerSocket welcomeSocket = new ServerSocket(PORT);

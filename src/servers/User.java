@@ -61,8 +61,6 @@ class User
 	        String[] parts = reply.split(" ");
 	        IPSS = parts[1];
 	        portSS = Integer.parseInt(parts[2]);
-	        
-	        
 	
 	        System.out.println("SS is located at " + IPSS + ":" + portSS);
 	
