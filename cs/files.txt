@@ -1,5 +1,2 @@
 banana.txt
-atum.jpg
-gahajalapa.mp3
-filme.mov
-ola.jpg
+atum.txt
