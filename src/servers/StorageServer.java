@@ -16,7 +16,9 @@ public class StorageServer {
   
   public static void main(String args[]) throws Exception {
 
-	  for (int i = 0; i < args.length; i++) {
+      System.out.println("Storage Server");
+
+      for (int i = 0; i < args.length; i++) {
 			if (args[i].equals("-p")) {
 				port = Integer.parseInt(args[i + 1]);
 			}
@@ -44,11 +46,13 @@ public class StorageServer {
     	int spaceCount = 0;
       	byte[] digit = new byte[DATA_SIZE];
         for(int i = 0, j=0; i < DATA_SIZE; i++) {
-        	digit[i] = input.readByte();
+        	byte tmp = input.readByte();
 
         	if(digit[i] == '\n') {
         		break;
         	}
+        	
+        	digit[i] = tmp;
         	
         	if(spaceCount == 3) {
         		fileData[j++] = digit[i];
@@ -63,7 +67,7 @@ public class StorageServer {
         String st = new String(digit);
 
         String fileName = st.split(" ")[1];
-    	fileName = fileName.substring(0, fileName.length()-1);
+    	// fileName = fileName.substring(0, fileName.length()-1);
         
         if (st.startsWith("REQ")) { // REQ Fn
         	System.out.println("Finding: " + fileName);
@@ -101,7 +105,9 @@ public class StorageServer {
   
   public static byte[] readFile(String filename) throws IOException {
 	    try {
-	    	File file = new File(System.getProperty("user.dir") + "/ss/" + port + "/" + filename);
+	    	String filePath = System.getProperty("user.dir") + "/ss/" + port + "/" + filename;
+	    	System.out.println("Finding file ("+filePath+")");
+	    	File file = new File(filePath);
 	      
 		  byte[] fileData = new byte[(int) file.length()];
 		  DataInputStream dis = new DataInputStream(new FileInputStream(file));
