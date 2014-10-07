@@ -7,7 +7,7 @@ import java.util.Arrays;
 class User 
 {
   public static int DATA_SIZE = 32767;
-  public static int CS_PORT = 9876;
+  public static int CS_PORT = 59022;
   public static String CS_NAME = "localhost";
   public static int portSS = -1;
   public static String IPSS;
@@ -137,7 +137,7 @@ class User
         String message = "UPR "+fileName+"\n";
         output.writeBytes(message); // UTF is a string encoding
         
-    	// System.out.println(new String(fileBytes));
+    	System.out.println(new String(fileBytes));
 
     	byte[] digit = new byte[DATA_SIZE];
         for(int i = 0; i < DATA_SIZE; i++) {

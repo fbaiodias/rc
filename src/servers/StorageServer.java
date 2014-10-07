@@ -16,7 +16,12 @@ public class StorageServer {
   
   public static void main(String args[]) throws Exception {
 
-    try {
+	  for (int i = 0; i < args.length; i++) {
+			if (args[i].equals("-p")) {
+				port = Integer.parseInt(args[i + 1]);
+			}
+		}
+    /*try {*/
 
       ServerSocket welcomeSocket = new ServerSocket(port);
       
@@ -38,21 +43,21 @@ public class StorageServer {
     	
     	int spaceCount = 0;
       	byte[] digit = new byte[DATA_SIZE];
-        for(int i = 0; i < DATA_SIZE; i++) {
+        for(int i = 0, j=0; i < DATA_SIZE; i++) {
         	digit[i] = input.readByte();
-        	
-        	if(spaceCount == 3) {
-        		fileData[i] = digit[i];
-        	}
-        	else if(digit[i] == ' ') {
-        		spaceCount++;
-           	}
-        	        	
-        	//System.out.print(digit[i]);
 
         	if(digit[i] == '\n') {
         		break;
         	}
+        	
+        	if(spaceCount == 3) {
+        		fileData[j++] = digit[i];
+        	}
+        	else if(digit[i] == ' ') {
+        		spaceCount++;
+           	}
+        	//System.out.print(digit[i]);
+
         }
 
         String st = new String(digit);
@@ -69,12 +74,14 @@ public class StorageServer {
         	output.writeBytes("\n");
         }
         else if (st.startsWith("UPS")) { // UPS fn size data
-        	System.out.println("Saving: " + fileName);
-
-        	FileOutputStream fileOutput = new FileOutputStream ("files/"+fileName);
+        	System.out.println("Saving: (" + fileName + ")");
+        	System.out.println("my name isnt");
+        	FileOutputStream fileOutput = new FileOutputStream (System.getProperty("user.dir") + "/ss/" + port + "/" + "testa.txt");
             fileOutput.write(fileData);
             fileOutput.close();
-                      
+            
+            System.out.println(new String(fileData));     
+            
             System.out.println("File saved");
 
         	output.writeBytes("AWS ok\n");
@@ -85,16 +92,16 @@ public class StorageServer {
       
       // welcomeSocket.close();
     }
-    catch (Exception e) {
+    /*catch (Exception e) {
       System.out.println("Failed to start TCP server at port " + port);
       System.out.println(e);
     }
-  }
+  }*/
   
   
   public static byte[] readFile(String filename) throws IOException {
 	    try {
-	      File file = new File(System.getProperty("user.dir") + "/ss/9880/atum.txt");
+	    	File file = new File(System.getProperty("user.dir") + "/ss/" + port + "/" + filename);
 	      
 		  byte[] fileData = new byte[(int) file.length()];
 		  DataInputStream dis = new DataInputStream(new FileInputStream(file));

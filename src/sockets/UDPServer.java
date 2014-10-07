@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class UDPServer extends Server {
 
-  public static int DATA_SIZE = 1024;
+  public static int DATA_SIZE = 32767;
   public static int PORT = 9876;  
   public static boolean IS_RUNNING = true;
 
