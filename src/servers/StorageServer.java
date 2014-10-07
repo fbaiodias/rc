@@ -5,9 +5,9 @@ import java.net.*;
 
 public class StorageServer {
 
-  public static int port = 9880; //ver como e para ser isto
+  public static int port = 59000; //ver como e para ser isto
   public static boolean IS_RUNNING = true;
-  public static int DATA_SIZE = 1024;
+  public static int DATA_SIZE = 32767;
 
   public void close() {
 	IS_RUNNING = false;
@@ -34,10 +34,20 @@ public class StorageServer {
       while(IS_RUNNING) {
         //clientSentence = inFromClient.readLine();
 
+    	byte[] fileData = new byte[DATA_SIZE];
+    	
+    	int spaceCount = 0;
       	byte[] digit = new byte[DATA_SIZE];
         for(int i = 0; i < DATA_SIZE; i++) {
         	digit[i] = input.readByte();
         	
+        	if(spaceCount == 3) {
+        		fileData[i] = digit[i];
+        	}
+        	else if(digit[i] == ' ') {
+        		spaceCount++;
+           	}
+        	        	
         	//System.out.print(digit[i]);
 
         	if(digit[i] == '\n') {
@@ -46,18 +56,28 @@ public class StorageServer {
         }
 
         String st = new String(digit);
+
+        String fileName = st.split(" ")[1];
+    	fileName = fileName.substring(0, fileName.length()-1);
         
-        if (st.startsWith("REQ")) {
-        	String fileName = st.split(" ")[1];
-        	
-        	fileName = fileName.substring(0, fileName.length()-1);
+        if (st.startsWith("REQ")) { // REQ Fn
         	System.out.println("Finding: " + fileName);
-        	
         	
         	byte[] fileBytes = readFile(fileName);
         	output.writeBytes("REP ok " + fileBytes.length + " ");
         	output.write(fileBytes);
         	output.writeBytes("\n");
+        }
+        else if (st.startsWith("UPS")) { // UPS fn size data
+        	System.out.println("Saving: " + fileName);
+
+        	FileOutputStream fileOutput = new FileOutputStream ("files/"+fileName);
+            fileOutput.write(fileData);
+            fileOutput.close();
+                      
+            System.out.println("File saved");
+
+        	output.writeBytes("AWS ok\n");
         }
         
         System.out.println("Received: " + st);

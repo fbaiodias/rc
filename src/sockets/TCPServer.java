@@ -8,7 +8,7 @@ public class TCPServer extends Server {
 
   public static int PORT = 58011;
   public static boolean IS_RUNNING = true;
-  public static int DATA_SIZE = 1024;
+  public static int DATA_SIZE = 32767;
   ArrayList<String> serverList = new ArrayList<String>();
   ArrayList<String> fileList = new ArrayList<String>();
 
