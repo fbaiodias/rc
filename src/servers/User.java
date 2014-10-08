@@ -35,9 +35,9 @@ class User
     byte[] sendData = new byte[DATA_SIZE];
     byte[] receiveData = new byte[DATA_SIZE];
 
-    Socket s = new Socket(CS_NAME, CS_PORT); 
-    DataInputStream input = new DataInputStream( s.getInputStream()); 
-    DataOutputStream output = new DataOutputStream( s.getOutputStream()); 
+    Socket s = null; 
+    DataInputStream input = null; 
+    DataOutputStream output = null; 
     
     Socket ss = null;
     DataInputStream inputSS = null;
@@ -45,9 +45,17 @@ class User
 
     System.out.println("Connected to TCP server at "+CS_NAME+":"+CS_PORT);
 
+    String sentence = "";
+    
     while(true) {
-      String sentence = inFromUser.readLine();
-
+    	     	
+      sentence = inFromUser.readLine();
+      System.out.println("sentence: " + sentence);
+      
+      s = new Socket(CS_NAME, CS_PORT); 
+      input = new DataInputStream( s.getInputStream()); 
+      output = new DataOutputStream( s.getOutputStream()); 
+      
       if(sentence.equals("list")) {
         sendData = new String("LST\n").getBytes();
 
@@ -144,22 +152,14 @@ class User
         String filePath = System.getProperty("user.dir") + "/files/" + fileName;
     	File file = new File(filePath);
     	int fileSize = (int) file.length();
-    	//System.out.println("" + fileSize);
+    	System.out.println("" + fileSize);
         
     	byte[] digit = new byte[fileSize];
         for(int i = 0; i < fileSize; i++) {
-        	try {
-        		digit[i] = input.readByte();
-        	}
-        	catch (EOFException e){
-        		break;
-        	} finally {
-        		System.out.println("" + i);
-        	}
-        	        	
-        	//System.out.print(digit[i]);
-
-        	if(digit[i] == '\n') {
+        	
+    		digit[i] = input.readByte();
+        	
+           	if(digit[i] == '\n') {
         		break;
         	}
         }
