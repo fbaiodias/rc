@@ -1,7 +1,11 @@
 package sockets;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
+import java.io.Writer;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.util.ArrayList;
 
 public abstract class Server extends Thread {
@@ -29,7 +33,21 @@ public abstract class Server extends Thread {
 			e.printStackTrace();
 		}
 		return list;
-        
-
 	}
+	
+	
+	
+	
+	public void addFile(String fileName) {
+		String filePath = System.getProperty("user.dir") + "/cs/files.txt";
+		Writer output;
+		try {
+			output = new BufferedWriter(new FileWriter(filePath, true));
+			output.append("\n" + fileName);
+			output.close();
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+	}
+	
 }

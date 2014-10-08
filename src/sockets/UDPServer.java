@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class UDPServer extends Server {
 
   public static int DATA_SIZE = 32767;
-  public static int PORT = 9876;  
+  public static int PORT = 58022;  
   public static boolean IS_RUNNING = true;
 
   public UDPServer (int port) {
@@ -50,7 +50,7 @@ public class UDPServer extends Server {
         	
         }
         
-        System.out.println("RECEIVED: " + sentence);
+        System.out.println("UDP RECEIVED: " + sentence);
 
         InetAddress IPAddress = receivePacket.getAddress();
         int port = receivePacket.getPort();
