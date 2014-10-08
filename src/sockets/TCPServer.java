@@ -17,28 +17,26 @@ public class TCPServer extends Server {
 	public void run() {
 
 		try {
-
-			String capitalizedSentence;
 			ServerSocket welcomeSocket = new ServerSocket(PORT);
 
 			System.out.println("TCP Server started at localhost:" + PORT);
 
-			Socket connectionSocket = welcomeSocket.accept();
+			Socket connectionSocket = null;
 
-			// nao sei o que estes dois sao
-			BufferedReader inFromClient = new BufferedReader(
-					new InputStreamReader(connectionSocket.getInputStream()));
-			DataOutputStream outToClient = new DataOutputStream(
-					connectionSocket.getOutputStream());
-
-			DataInputStream input = new DataInputStream(
-					connectionSocket.getInputStream());
-			DataOutputStream output = new DataOutputStream(
-					connectionSocket.getOutputStream());
+			DataInputStream input = null;
+			DataOutputStream output = null;
 
 			System.out.println("Client connected to TCP");
 
 			while (IS_RUNNING) {
+				
+				connectionSocket = welcomeSocket.accept();
+
+				input = new DataInputStream(
+						connectionSocket.getInputStream());
+				output = new DataOutputStream(
+						connectionSocket.getOutputStream());
+				
 				byte[] digit = new byte[DATA_SIZE];
 				for (int i = 0; i < DATA_SIZE; i++) {
 					System.out.println("printing " + i);
@@ -71,18 +69,18 @@ public class TCPServer extends Server {
 						message = "AWR dup\n";
 					}
 
-					
-					
 					if (welcomeSocket != null) {
+						System.out.println("Writing this message:" + message);
 						output.writeBytes(message); // UTF is a string
 														// encoding
 					}
 
 					digit = new byte[DATA_SIZE];
 					for (int i = 0; i < DATA_SIZE; i++) {
+						System.out.print("Am i stuck?" + i);
 						byte tmp = input.readByte();
 
-						// System.out.print(digit[i]);
+						
 
 						if (tmp == '\n') {
 							break;
@@ -122,6 +120,10 @@ public class TCPServer extends Server {
 					message = "ERR";
 				}
 
+				input.close();
+				output.close();
+				connectionSocket.close();
+				
 			}
 
 			// welcomeSocket.close();

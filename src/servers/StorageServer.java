@@ -28,35 +28,37 @@ public class StorageServer {
 
 		System.out.println("TCP Server started at localhost:" + port);
 
-		Socket connectionSocket = welcomeSocket.accept();
-
-		DataInputStream input = new DataInputStream(
-				connectionSocket.getInputStream());
-		DataOutputStream output = new DataOutputStream(
-				connectionSocket.getOutputStream());
-
 		System.out.println("Central Server connected");
 
+		Socket connectionSocket = null;
+		DataInputStream input = null;
+		DataOutputStream output = null;
+		
 		while (IS_RUNNING) {
+			
+			connectionSocket = welcomeSocket.accept();
+
+			input = new DataInputStream(connectionSocket.getInputStream());
+			output = new DataOutputStream(connectionSocket.getOutputStream());
 			// clientSentence = inFromClient.readLine();
 
 			byte[] fileData = new byte[DATA_SIZE];
 
 			int spaceCount = 0;
 			byte[] digit = new byte[DATA_SIZE];
-			for (int i = 0, j = 0; i < DATA_SIZE;) {
-
+			for (int i = 0, j = 0; i < DATA_SIZE; i++) {
+				System.out.print("indice: " + i + ")");
 				byte tmp = input.readByte();
 
-				if (tmp != '\n') {
-					digit[i] = tmp;
+				if (tmp == '\n') {
+					break;
+				}
+				digit[i] = tmp;
 
-					if (spaceCount == 3) {
-						fileData[j++] = digit[i];
-					} else if (digit[i] == ' ') {
-						spaceCount++;
-					}
-					i++;
+				if (spaceCount == 3) {
+					fileData[j++] = digit[i];
+				} else if (digit[i] == ' ') {
+					spaceCount++;
 				}
 
 				// System.out.print(digit[i]);
@@ -65,7 +67,7 @@ public class StorageServer {
 
 			
 			String st = new String(digit);
-			System.out.println("ta vazio = " + st + ")");
+			System.out.println("ta vazio = '" + st + "'");
 
 			String fileName = st.split(" ")[1];
 			fileName = fileName.trim();
@@ -100,6 +102,9 @@ public class StorageServer {
 			}
 
 			//System.out.println("Received: " + st + ")");
+			input.close();
+			output.close();
+			connectionSocket.close();
 		}
 
 		// welcomeSocket.close();

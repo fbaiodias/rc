@@ -5,7 +5,7 @@ import sockets.*;
 
 class CentralServer {
   
-  public static int PORT = 58022;
+  public static int PORT = 59022;
   public static int DATA_SIZE = 32767;
   
   public static void main(String args[]) throws Exception {

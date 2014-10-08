@@ -53,9 +53,7 @@ class User {
 			sentence = inFromUser.readLine();
 			System.out.println("sentence: " + sentence);
 
-			s = new Socket(CS_NAME, CS_PORT);
-			input = new DataInputStream(s.getInputStream());
-			output = new DataOutputStream(s.getOutputStream());
+			
 
 			if (sentence.equals("list")) {
 				sendData = new String("LST\n").getBytes();
@@ -133,7 +131,15 @@ class User {
 
 				System.out.println("File saved");
 
+				ss.close();
+				inputSS.close();
+				outputSS.close();
+				
 			} else if (sentence.startsWith("upload")) {
+				s = new Socket(CS_NAME, CS_PORT);
+				input = new DataInputStream(s.getInputStream());
+				output = new DataOutputStream(s.getOutputStream());
+				
 				String fileName = sentence.substring(7);
 
 				byte[] fileBytes = readFile(fileName);
@@ -147,7 +153,7 @@ class User {
 
 				String filePath = System.getProperty("user.dir") + "/files/" + fileName;
 				File file = new File(filePath);
-				int fileSize = (int) file.length();
+				int fileSize = (int) file.length() + 7;
 				System.out.println("" + fileSize);
 
 				System.out.println("gonna read bytes");
@@ -164,7 +170,8 @@ class User {
 
 				String st = new String(digit);
 
-				// System.out.print(st);
+				System.out.println("I have received this: " + st);
+				System.out.println("Yes I have");
 
 				if (st.startsWith("AWR")) {
 					String status = st.substring(4);
@@ -184,6 +191,10 @@ class User {
 				} else {
 					System.out.println("Received: " + st);
 				}
+				
+				s.close();
+				input.close();
+				output.close();
 			} else {
 				System.out.println("UNKNOWN COMMAND");
 			}

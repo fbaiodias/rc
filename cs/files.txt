@@ -1,3 +1,5 @@
 banana.txt
-atum.txt
+f.jpg
+f2.jpg
+r.txt
 texto93
