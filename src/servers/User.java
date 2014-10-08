@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 class User 
 {
-  public static int DATA_SIZE = 32767;
+  public static int DATA_SIZE = 300000;
   public static int CS_PORT = 59022;
   public static String CS_NAME = "localhost";
   public static int portSS = -1;
@@ -139,12 +139,24 @@ class User
         String message = "UPR "+fileName+"\n";
         output.writeBytes(message); // UTF is a string encoding
         
-    	System.out.println(new String(fileBytes));
+    	//System.out.println(new String(fileBytes));
 
-    	byte[] digit = new byte[DATA_SIZE];
-        for(int i = 0; i < DATA_SIZE; i++) {
-        	digit[i] = input.readByte();
-        	
+        String filePath = System.getProperty("user.dir") + "/files/" + fileName;
+    	File file = new File(filePath);
+    	int fileSize = (int) file.length();
+    	//System.out.println("" + fileSize);
+        
+    	byte[] digit = new byte[fileSize];
+        for(int i = 0; i < fileSize; i++) {
+        	try {
+        		digit[i] = input.readByte();
+        	}
+        	catch (EOFException e){
+        		break;
+        	} finally {
+        		System.out.println("" + i);
+        	}
+        	        	
         	//System.out.print(digit[i]);
 
         	if(digit[i] == '\n') {
