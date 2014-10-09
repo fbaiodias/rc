@@ -5,7 +5,7 @@ import java.net.*;
 import java.util.Arrays;
 
 class User {
-	public static int DATA_SIZE = 300000;
+	public static int DATA_SIZE = 1024;
 	public static int CS_PORT = 59022;
 	public static String CS_NAME = "localhost";
 	public static int portSS = -1;

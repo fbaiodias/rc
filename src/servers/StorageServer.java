@@ -7,7 +7,7 @@ public class StorageServer {
 
 	public static int port = 59000; // ver como e para ser isto
 	public static boolean IS_RUNNING = true;
-	public static int DATA_SIZE = 300000;
+	public static int DATA_SIZE = 100;
 
 	public void close() {
 		IS_RUNNING = false;
@@ -117,10 +117,6 @@ public class StorageServer {
 			}
 			
 			output.writeBytes(outputMessage);
-			
-			
-			
-			
 			
 			/********************************************************************************/
 /*

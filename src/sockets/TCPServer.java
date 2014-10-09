@@ -123,18 +123,18 @@ public class TCPServer extends Server {
 							socket = new Socket(sParts[0], Integer.parseInt(sParts[1])); 
 							inputSS = new DataInputStream( socket.getInputStream());
 							outputSS = new DataOutputStream( socket.getOutputStream());
-							outputSS.writeBytes("UPS " + fileName + " " + fileSize + " ");
-							outputSS.write(fileData);
-							outputSS.writeBytes("\n");
+							
+							byte[] sss = ("UPS " + fileName + " " + fileSize + " ").getBytes();
+
+							byte[] c = new byte[sss.length + fileData.length];
+							System.arraycopy(sss, 0, c, 0, sss.length);
+							System.arraycopy(fileData, 0, c, sss.length, fileData.length);
+							outputSS.write(c);
+							outputSS.write('\n');
 						}
 						//verificar se tive sucesso ou nao pois palmas
 						//James Marcus
-						
 						addFile(fileName);
-						
-						
-						
-						
 					}
 				}
 				else {
