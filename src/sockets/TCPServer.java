@@ -8,7 +8,7 @@ public class TCPServer extends Server {
 
 	public static int PORT = 58022;
 	public static boolean IS_RUNNING = true;
-	public static int DATA_SIZE = 32767;
+	public static int DATA_SIZE = 300000;
 
 	public TCPServer(int port) {
 		PORT = port;
@@ -70,25 +70,49 @@ public class TCPServer extends Server {
 														// encoding
 					}
 
-					digit = new byte[DATA_SIZE];
-					for (int i = 0; i < DATA_SIZE; i++) {
+					byte[] digitUPC = new byte[DATA_SIZE];
+					int spaceCount = 0;
+					int fileSize = -1;
+					for (int i = 0; spaceCount < 2; i++) {
 						byte tmp = input.readByte();
-
+						digitUPC[i] = tmp;
 						
-
 						if (tmp == '\n') {
 							break;
 						}
 						
-						digit[i] = tmp;
+						if (tmp == ' ') {
+							spaceCount++;
+							if (spaceCount == 2) {
+								String response = new String(digitUPC);
+								fileSize = Integer
+										.parseInt(response.split(" ")[1]);
+								System.out.println("parseInt: fileSize=" + fileSize);
+							}
+						}
 					}
 					
-					st = new String(digit);
+					String messageUp = new String(digitUPC);
 					
-					if (st.startsWith("UPC")) {
-						String[] parts = st.split(" ", 3);
+					//Verificar se o ficheiro foi recebido com sucesso
+					
+					byte[] fileData = null;
+					if (fileSize == -1) {
+						System.err.println("File not found on server");
+					} else {
+						fileData = new byte[fileSize];
+
+						for (int j = 0; j < fileSize; j++) {
+							fileData[j] = input.readByte();
+						}
 						
-						String fileSize = parts[1];
+						st = new String(fileData);
+					}
+					
+					
+					if (messageUp.startsWith("UPC")) {
+						System.out.println("Starts with UPC. " + " fileName:" + fileName + " fileSize:" + fileSize + " message:" + messageUp);
+						System.out.println(st);
 						
 						Socket socket;
 						DataInputStream inputSS;
@@ -99,12 +123,16 @@ public class TCPServer extends Server {
 							socket = new Socket(sParts[0], Integer.parseInt(sParts[1])); 
 							inputSS = new DataInputStream( socket.getInputStream());
 							outputSS = new DataOutputStream( socket.getOutputStream());
-							outputSS.writeBytes("UPS " + fileName + " " + fileSize + " " + parts[2] + "\n");
+							outputSS.writeBytes("UPS " + fileName + " " + fileSize + " ");
+							outputSS.write(fileData);
+							outputSS.writeBytes("\n");
 						}
 						//verificar se tive sucesso ou nao pois palmas
 						//James Marcus
 						
 						addFile(fileName);
+						
+						
 						
 						
 					}
@@ -121,7 +149,8 @@ public class TCPServer extends Server {
 
 			// welcomeSocket.close();
 		} catch (Exception e) {
-			System.out.println(e);
+			//System.out.println(e);
+			e.printStackTrace();
 		}
 	}
 

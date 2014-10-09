@@ -52,5 +52,5 @@ public abstract class Server extends Thread {
 			System.out.println(e);
 		}
 	}
-	
+
 }
