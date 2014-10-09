@@ -40,6 +40,7 @@ public class StorageServer {
 			output = new DataOutputStream(connectionSocket.getOutputStream());
 			// clientSentence = inFromClient.readLine();
 
+			System.out.println("New request from "+connectionSocket.getRemoteSocketAddress().toString());
 			//byte[] fileData = new byte[DATA_SIZE];
 			
 			/********************************************************************************/

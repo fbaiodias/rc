@@ -30,6 +30,7 @@ public class UDPServer extends Server {
         DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
         serverSocket.receive(receivePacket);
 
+        System.out.println("New request from "+receivePacket.getAddress()+":"+receivePacket.getPort());
         
         String sentence = new String(receivePacket.getData(), 0, receivePacket.getLength());
         

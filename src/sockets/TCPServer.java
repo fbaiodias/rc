@@ -32,6 +32,9 @@ public class TCPServer extends Server {
 				
 				connectionSocket = welcomeSocket.accept();
 
+				System.out.println("New request from "+connectionSocket.getRemoteSocketAddress().toString());
+				
+				
 				input = new DataInputStream(
 						connectionSocket.getInputStream());
 				output = new DataOutputStream(
