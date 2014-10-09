@@ -47,17 +47,17 @@ class User {
 			sentence = inFromUser.readLine();
 
 			if (sentence.equals("list")) {
+				
 				sendData = new String("LST\n").getBytes();
 
 				DatagramPacket sendPacket = new DatagramPacket(sendData,
 						sendData.length, IPAddress, CS_PORT);
 				clientSocket.send(sendPacket);
+				
 
 				DatagramPacket receivePacket = new DatagramPacket(receiveData,
 						receiveData.length);
 				clientSocket.receive(receivePacket);
-
-				//System.out.println("Connected to UDP server at " + CS_NAME + ":" + CS_PORT);
 
 				String reply = new String(receivePacket.getData()).split("\n")[0];
 
@@ -66,9 +66,7 @@ class User {
 					IPSS = parts[1];
 					portSS = Integer.parseInt(parts[2]);
 
-					//Mostrar dados do SS atribuido ao utilizador
-					//Acho que nao e preciso imprimir mas tambem nao nao nao nao nao nao
-					System.out.println("SS is located at " + IPSS + ":"	+ portSS); //SABER DISTO
+					System.out.println("SS is located at " + IPSS + ":"	+ portSS);
 
 					//Mostrar lista de ficheiros disponiveis
 					int length = Integer.parseInt(parts[3]);
@@ -76,7 +74,7 @@ class User {
 						System.out.println((i + 1) + ": " + parts[4 + i]);
 					}
 				} else {
-					System.out.println("LIST: " + reply); //SABER DISTO
+					System.err.println("Server returned an error: " + reply);
 				}
 			} else if (sentence.equals("exit")) {
 				break;
@@ -95,13 +93,17 @@ class User {
 
 					byte[] digit = new byte[DATA_SIZE];
 					int spaceCount = 0;
-					int fileSize = 0;
+					int fileSize = -1;
 
 					try {
 						for (int i = 0; spaceCount < 3; i++) {
 							byte tmp = inputSS.readByte();
 							digit[i] = tmp;
-
+							
+							if (tmp == '\n') {
+								break;
+							}
+							
 							if (tmp == ' ') {
 								spaceCount++;
 								if (spaceCount == 3) {
@@ -110,23 +112,27 @@ class User {
 											.parseInt(response.split(" ")[2]);
 								}
 							}
+							
+
 						}
-						byte[] fileData = new byte[fileSize];
+						
+						//Verificar se o ficheiro foi recebido com sucesso
+						if (fileSize == -1) {
+							System.err.println("File not found on server");
+						} else {
+							byte[] fileData = new byte[fileSize];
 
-						for (int j = 0; j < fileSize; j++) {
-							fileData[j] = inputSS.readByte();
+							for (int j = 0; j < fileSize; j++) {
+								fileData[j] = inputSS.readByte();
+							}
+							FileOutputStream fileOutput = new FileOutputStream("files/"
+									+ fileName);
+							fileOutput.write(fileData);
+							fileOutput.close();
+
+							System.out.println("File saved");
 						}
-						FileOutputStream fileOutput = new FileOutputStream("files/"
-								+ fileName);
-						fileOutput.write(fileData);
-						fileOutput.close();
-
-						System.out.println("File saved");
-					} catch (EOFException e) {
-
-						// ESTE TRATAMENTO DE ERRO TA BUE MANHOSO
-						// SABER DISTO
-						System.err.println("File not found on server");
+						
 					} catch (Exception e) {
 						System.err.println("Unexpected error: " + e);
 					}
@@ -139,59 +145,64 @@ class User {
 				}
 
 			} else if (sentence.startsWith("upload")) {
-				s = new Socket(CS_NAME, CS_PORT);
-				input = new DataInputStream(s.getInputStream());
-				output = new DataOutputStream(s.getOutputStream());
+				try {
+					s = new Socket(CS_NAME, CS_PORT);
+					input = new DataInputStream(s.getInputStream());
+					output = new DataOutputStream(s.getOutputStream());
 
-				//System.out.println("Connected to TCP Central Server at " + CS_NAME + ":" + CS_PORT);
+					//System.out.println("Connected to TCP Central Server at " + CS_NAME + ":" + CS_PORT);
 
-				String fileName = sentence.substring(7);
+					String fileName = sentence.substring(7);
 
-				byte[] fileBytes = readFile(fileName);
+					byte[] fileBytes = readFile(fileName);
 
-				String message = "UPR " + fileName + "\n";
-				output.writeBytes(message); // UTF is a string encoding
+					String message = "UPR " + fileName + "\n";
+					output.writeBytes(message); // UTF is a string encoding
 
-				String filePath = System.getProperty("user.dir") + "/files/"
-						+ fileName;
-				File file = new File(filePath);
-				int fileSize = (int) file.length() + 7;
+					String filePath = System.getProperty("user.dir") + "/files/"
+							+ fileName;
+					File file = new File(filePath);
+					int fileSize = (int) file.length() + 7;
 
-				byte[] digit = new byte[fileSize];
-				for (int i = 0; i < fileSize; i++) {
-					byte tmp = input.readByte();
+					byte[] digit = new byte[fileSize];
+					for (int i = 0; i < fileSize; i++) {
+						byte tmp = input.readByte();
 
-					if (tmp == '\n') {
-						break;
+						if (tmp == '\n') {
+							break;
+						}
+
+						digit[i] = tmp;
 					}
 
-					digit[i] = tmp;
-				}
+					String st = new String(digit);
 
-				String st = new String(digit);
+					if (st.startsWith("AWR")) {
+						String status = st.substring(4);
+						if (status.startsWith("dup")) {
+							System.err.println("Duplicate file");
+						} else if (status.startsWith("new")) {
+							System.out.println("Sending file...");
 
-				if (st.startsWith("AWR")) {
-					String status = st.substring(4);
-					if (status.startsWith("dup")) {
-						System.err.println("Duplicate file");
-					} else if (status.startsWith("new")) {
-						System.out.println("Sending file...");
-
-						message = "UPC " + fileBytes.length + " ";
-						output.writeBytes(message);
-						output.write(fileBytes);
-						output.writeBytes("\n");
-						System.out.println("File uploaded");
+							message = "UPC " + fileBytes.length + " ";
+							output.writeBytes(message);
+							output.write(fileBytes);
+							output.writeBytes("\n");
+							System.out.println("File uploaded");
+						} else {
+							System.out.println("Received: " + st); // SABER DISTO
+						}
 					} else {
 						System.out.println("Received: " + st); // SABER DISTO
 					}
-				} else {
-					System.out.println("Received: " + st); // SABER DISTO
-				}
 
-				s.close();
-				input.close();
-				output.close();
+					s.close();
+					input.close();
+					output.close();
+				} catch (ConnectException e) {
+					System.err.println("Server unavailable");
+				}
+				
 			} else {
 				System.err.println("UNKNOWN COMMAND");
 			}

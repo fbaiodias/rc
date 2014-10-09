@@ -39,10 +39,7 @@ public class TCPServer extends Server {
 				
 				byte[] digit = new byte[DATA_SIZE];
 				for (int i = 0; i < DATA_SIZE; i++) {
-					System.out.println("printing " + i);
 					byte tmp = input.readByte();
-					
-					System.out.print(digit[i]);
 
 					if (tmp == '\n') {
 						break;
@@ -53,7 +50,6 @@ public class TCPServer extends Server {
 				}
 
 				String st = new String(digit);
-				System.out.println("TCP RECEIVED: " + st);
 				
 				String message = "";
 				
@@ -70,14 +66,12 @@ public class TCPServer extends Server {
 					}
 
 					if (welcomeSocket != null) {
-						System.out.println("Writing this message:" + message);
 						output.writeBytes(message); // UTF is a string
 														// encoding
 					}
 
 					digit = new byte[DATA_SIZE];
 					for (int i = 0; i < DATA_SIZE; i++) {
-						System.out.print("Am i stuck?" + i);
 						byte tmp = input.readByte();
 
 						
@@ -92,7 +86,6 @@ public class TCPServer extends Server {
 					st = new String(digit);
 					
 					if (st.startsWith("UPC")) {
-						System.out.println("UPC up in this upc");
 						String[] parts = st.split(" ", 3);
 						
 						String fileSize = parts[1];
@@ -128,7 +121,6 @@ public class TCPServer extends Server {
 
 			// welcomeSocket.close();
 		} catch (Exception e) {
-			System.out.println("Failed to start TCP server at port " + PORT);
 			System.out.println(e);
 		}
 	}

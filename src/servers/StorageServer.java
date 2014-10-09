@@ -28,8 +28,6 @@ public class StorageServer {
 
 		System.out.println("TCP Server started at localhost:" + port);
 
-		System.out.println("Central Server connected");
-
 		Socket connectionSocket = null;
 		DataInputStream input = null;
 		DataOutputStream output = null;
@@ -47,7 +45,6 @@ public class StorageServer {
 			int spaceCount = 0;
 			byte[] digit = new byte[DATA_SIZE];
 			for (int i = 0, j = 0; i < DATA_SIZE; i++) {
-				System.out.print("indice: " + i + ")");
 				byte tmp = input.readByte();
 
 				if (tmp == '\n') {
@@ -61,21 +58,16 @@ public class StorageServer {
 					spaceCount++;
 				}
 
-				// System.out.print(digit[i]);
-
 			}
 
 			
 			String st = new String(digit);
-			System.out.println("ta vazio = '" + st + "'");
 
 			String fileName = st.split(" ")[1];
 			fileName = fileName.trim();
 
 			if (st.startsWith("REQ")) { // REQ Fn
-				System.out.println("Finding: " + fileName);
 
-				System.out.println("gonna try to read da file");
 				byte[] fileBytes = readFile(fileName);
 				
 				if (fileBytes == null) {
@@ -89,16 +81,13 @@ public class StorageServer {
 			} else if (st.startsWith("UPS")) { // UPS fn size data
 
 				// fileName = fileName.substring(0, fileName.length());
-				System.out.print("Saving: (" + fileName + ")");
-				System.out.print("my name isnt");
+				System.out.println("Saving: (" + fileName + ")");
 
 				FileOutputStream fileOutput = new FileOutputStream(
 						System.getProperty("user.dir") + "/ss/" + port + "/"
 								+ fileName);
 				fileOutput.write(fileData);
 				fileOutput.close();
-
-				//System.out.println(new String(fileData));
 
 				System.out.println("File saved");
 
@@ -124,7 +113,6 @@ public class StorageServer {
 		try {
 			String filePath = System.getProperty("user.dir") + "/ss/" + port
 					+ "/" + filename;
-			System.out.println("Finding file (" + filePath + ")");
 			File file = new File(filePath);
 
 			byte[] fileData = new byte[(int) file.length()];
