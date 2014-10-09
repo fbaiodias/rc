@@ -67,6 +67,7 @@ class User {
 					portSS = Integer.parseInt(parts[2]);
 
 					//Mostrar dados do SS atribuido ao utilizador
+					//Acho que nao e preciso imprimir mas tambem nao nao nao nao nao nao
 					System.out.println("SS is located at " + IPSS + ":"	+ portSS); //SABER DISTO
 
 					//Mostrar lista de ficheiros disponiveis
@@ -80,58 +81,62 @@ class User {
 			} else if (sentence.equals("exit")) {
 				break;
 			} else if (sentence.startsWith("retrieve")) {
-				ss = new Socket(IPSS, portSS);
-				inputSS = new DataInputStream(ss.getInputStream());
-				outputSS = new DataOutputStream(ss.getOutputStream());
-				String fileName = sentence.substring(9);
+				if (portSS != -1) {
+					ss = new Socket(IPSS, portSS);
+					inputSS = new DataInputStream(ss.getInputStream());
+					outputSS = new DataOutputStream(ss.getOutputStream());
+					String fileName = sentence.substring(9);
 
-				String message = "REQ " + fileName + "\n";
-				if (ss != null) {
-					outputSS.writeBytes(message); // UTF is a string encoding
-				}
+					String message = "REQ " + fileName + "\n";
+					if (ss != null) {
+						outputSS.writeBytes(message); // UTF is a string encoding
+					}
 
 
-				byte[] digit = new byte[DATA_SIZE];
-				int spaceCount = 0;
-				int fileSize = 0;
+					byte[] digit = new byte[DATA_SIZE];
+					int spaceCount = 0;
+					int fileSize = 0;
 
-				try {
-					for (int i = 0; spaceCount < 3; i++) {
-						byte tmp = inputSS.readByte();
-						digit[i] = tmp;
+					try {
+						for (int i = 0; spaceCount < 3; i++) {
+							byte tmp = inputSS.readByte();
+							digit[i] = tmp;
 
-						if (tmp == ' ') {
-							spaceCount++;
-							if (spaceCount == 3) {
-								String response = new String(digit);
-								fileSize = Integer
-										.parseInt(response.split(" ")[2]);
+							if (tmp == ' ') {
+								spaceCount++;
+								if (spaceCount == 3) {
+									String response = new String(digit);
+									fileSize = Integer
+											.parseInt(response.split(" ")[2]);
+								}
 							}
 						}
+						byte[] fileData = new byte[fileSize];
+
+						for (int j = 0; j < fileSize; j++) {
+							fileData[j] = inputSS.readByte();
+						}
+						FileOutputStream fileOutput = new FileOutputStream("files/"
+								+ fileName);
+						fileOutput.write(fileData);
+						fileOutput.close();
+
+						System.out.println("File saved");
+					} catch (EOFException e) {
+
+						// ESTE TRATAMENTO DE ERRO TA BUE MANHOSO
+						// SABER DISTO
+						System.err.println("File not found on server");
+					} catch (Exception e) {
+						System.err.println("Unexpected error: " + e);
 					}
-					byte[] fileData = new byte[fileSize];
 
-					for (int j = 0; j < fileSize; j++) {
-						fileData[j] = inputSS.readByte();
-					}
-					FileOutputStream fileOutput = new FileOutputStream("files/"
-							+ fileName);
-					fileOutput.write(fileData);
-					fileOutput.close();
-
-					System.out.println("File saved");
-				} catch (EOFException e) {
-
-					// ESTE TRATAMENTO DE ERRO TA BUE MANHOSO
-					// SABER DISTO
-					System.err.println("File not found on server");
-				} catch (Exception e) {
-					System.err.println("Unexpected error: " + e);
+					ss.close();
+					inputSS.close();
+					outputSS.close();
+				} else {
+					System.err.println("Storage server unknown. Please run 'list' before 'retrieve'");
 				}
-
-				ss.close();
-				inputSS.close();
-				outputSS.close();
 
 			} else if (sentence.startsWith("upload")) {
 				s = new Socket(CS_NAME, CS_PORT);
