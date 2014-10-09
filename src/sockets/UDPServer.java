@@ -39,18 +39,23 @@ public class UDPServer extends Server {
         	
         	ArrayList<String> fileList = readFile("files");
         	
-        	resSentence = "AWL " + chosenSS + " " + fileList.size() + " ";
-        	
-        	for (String s : fileList) {
-        		resSentence += s + " ";
-        	}
-        	
-        	resSentence = resSentence.substring(0, resSentence.length()-1);
-        	resSentence += "\n";
-        	
+			System.out.println("Number of files: "+fileList.size());
+			
+			if(fileList.isEmpty() || fileList.size() == 0) {
+				resSentence = "EOF";
+	        	resSentence += "\n";
+			}
+			else {
+	        	resSentence = "AWL " + chosenSS + " " + fileList.size() + " ";
+	        	
+	        	for (String s : fileList) {
+	        		resSentence += s + " ";
+	        	}
+	        	
+	        	resSentence = resSentence.substring(0, resSentence.length()-1);
+	        	resSentence += "\n";
+			}
         }
-        
-        System.out.println("UDP RECEIVED: " + sentence);
 
         InetAddress IPAddress = receivePacket.getAddress();
         int port = receivePacket.getPort();
@@ -64,7 +69,6 @@ public class UDPServer extends Server {
       serverSocket.close();
     }
     catch (Exception e) {
-      System.out.println("Failed to start UDP server at port " + PORT);
       System.out.println(e);
     }
   }

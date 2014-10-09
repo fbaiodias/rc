@@ -43,7 +43,10 @@ public abstract class Server extends Thread {
 		Writer output;
 		try {
 			output = new BufferedWriter(new FileWriter(filePath, true));
-			output.append("\n" + fileName);
+			if(!readFile("files").isEmpty()) {
+				output.append("\n");
+			}
+			output.append(fileName);
 			output.close();
 		} catch (Exception e) {
 			System.out.println(e);
