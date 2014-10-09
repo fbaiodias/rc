@@ -24,9 +24,6 @@ class User {
 			}
 		}
 
-		System.out.println("Connecting to UDP server at " + CS_NAME + ":"
-				+ CS_PORT);
-
 		BufferedReader inFromUser = new BufferedReader(new InputStreamReader(
 				System.in));
 		clientSocket = new DatagramSocket();
@@ -43,17 +40,11 @@ class User {
 		DataInputStream inputSS = null;
 		DataOutputStream outputSS = null;
 
-		System.out.println("Connected to TCP server at " + CS_NAME + ":"
-				+ CS_PORT);
-
 		String sentence = "";
 
 		while (true) {
 
 			sentence = inFromUser.readLine();
-			System.out.println("sentence: " + sentence);
-
-			
 
 			if (sentence.equals("list")) {
 				sendData = new String("LST\n").getBytes();
@@ -66,6 +57,8 @@ class User {
 						receiveData.length);
 				clientSocket.receive(receivePacket);
 
+				//System.out.println("Connected to UDP server at " + CS_NAME + ":" + CS_PORT);
+
 				String reply = new String(receivePacket.getData()).split("\n")[0];
 
 				if (reply.startsWith("AWL")) {
@@ -73,15 +66,16 @@ class User {
 					IPSS = parts[1];
 					portSS = Integer.parseInt(parts[2]);
 
-					System.out.println("SS is located at " + IPSS + ":"
-							+ portSS);
+					//Mostrar dados do SS atribuido ao utilizador
+					System.out.println("SS is located at " + IPSS + ":"	+ portSS); //SABER DISTO
 
+					//Mostrar lista de ficheiros disponiveis
 					int length = Integer.parseInt(parts[3]);
 					for (int i = 0; i < length; i++) {
 						System.out.println((i + 1) + ": " + parts[4 + i]);
 					}
 				} else {
-					System.out.println("LIST: " + reply);
+					System.out.println("LIST: " + reply); //SABER DISTO
 				}
 			} else if (sentence.equals("exit")) {
 				break;
@@ -90,77 +84,78 @@ class User {
 				inputSS = new DataInputStream(ss.getInputStream());
 				outputSS = new DataOutputStream(ss.getOutputStream());
 				String fileName = sentence.substring(9);
-				System.out.println("RETRIEVE: " + fileName);
 
 				String message = "REQ " + fileName + "\n";
 				if (ss != null) {
 					outputSS.writeBytes(message); // UTF is a string encoding
 				}
 
-				System.out.println(message + " sent to " + ss.getInetAddress()
-						+ " or " + IPSS);
 
 				byte[] digit = new byte[DATA_SIZE];
 				int spaceCount = 0;
 				int fileSize = 0;
-				
-				System.out.println("readBytess1");
-				for (int i = 0; spaceCount < 3; i++) {
-					byte tmp = inputSS.readByte();
-					digit[i] = tmp;
-					
-					if (tmp == ' ') {
-						spaceCount++;
-						if (spaceCount == 3) {
-							String response = new String(digit);
-							fileSize = Integer.parseInt(response.split(" ")[2]);
+
+				try {
+					for (int i = 0; spaceCount < 3; i++) {
+						byte tmp = inputSS.readByte();
+						digit[i] = tmp;
+
+						if (tmp == ' ') {
+							spaceCount++;
+							if (spaceCount == 3) {
+								String response = new String(digit);
+								fileSize = Integer
+										.parseInt(response.split(" ")[2]);
+							}
 						}
 					}
-				}
-				byte[] fileData = new byte[fileSize];
-				
-				System.out.println("readByte2");
-				for (int j = 0; j < fileSize; j++) {
-					fileData[j] = inputSS.readByte();
-				}
-				System.out.println("readByte1");
-				FileOutputStream fileOutput = new FileOutputStream("files/"
-						+ fileName);
-				fileOutput.write(fileData);
-				fileOutput.close();
+					byte[] fileData = new byte[fileSize];
 
-				System.out.println("File saved");
+					for (int j = 0; j < fileSize; j++) {
+						fileData[j] = inputSS.readByte();
+					}
+					FileOutputStream fileOutput = new FileOutputStream("files/"
+							+ fileName);
+					fileOutput.write(fileData);
+					fileOutput.close();
+
+					System.out.println("File saved");
+				} catch (EOFException e) {
+
+					// ESTE TRATAMENTO DE ERRO TA BUE MANHOSO
+					// SABER DISTO
+					System.err.println("File not found on server");
+				} catch (Exception e) {
+					System.err.println("Unexpected error: " + e);
+				}
 
 				ss.close();
 				inputSS.close();
 				outputSS.close();
-				
+
 			} else if (sentence.startsWith("upload")) {
 				s = new Socket(CS_NAME, CS_PORT);
 				input = new DataInputStream(s.getInputStream());
 				output = new DataOutputStream(s.getOutputStream());
-				
+
+				//System.out.println("Connected to TCP Central Server at " + CS_NAME + ":" + CS_PORT);
+
 				String fileName = sentence.substring(7);
 
 				byte[] fileBytes = readFile(fileName);
-				System.out.println("readFile");
 
-				System.out.println("gonna writeBytes");
 				String message = "UPR " + fileName + "\n";
 				output.writeBytes(message); // UTF is a string encoding
 
-				// System.out.println(new String(fileBytes));
-
-				String filePath = System.getProperty("user.dir") + "/files/" + fileName;
+				String filePath = System.getProperty("user.dir") + "/files/"
+						+ fileName;
 				File file = new File(filePath);
 				int fileSize = (int) file.length() + 7;
-				System.out.println("" + fileSize);
 
-				System.out.println("gonna read bytes");
 				byte[] digit = new byte[fileSize];
 				for (int i = 0; i < fileSize; i++) {
 					byte tmp = input.readByte();
-					
+
 					if (tmp == '\n') {
 						break;
 					}
@@ -170,15 +165,12 @@ class User {
 
 				String st = new String(digit);
 
-				System.out.println("I have received this: " + st);
-				System.out.println("Yes I have");
-
 				if (st.startsWith("AWR")) {
 					String status = st.substring(4);
 					if (status.startsWith("dup")) {
-						System.out.println("Duplicate file");
+						System.err.println("Duplicate file");
 					} else if (status.startsWith("new")) {
-						System.out.println("Sending file");
+						System.out.println("Sending file...");
 
 						message = "UPC " + fileBytes.length + " ";
 						output.writeBytes(message);
@@ -186,26 +178,28 @@ class User {
 						output.writeBytes("\n");
 						System.out.println("File uploaded");
 					} else {
-						System.out.println("Received: " + st);
+						System.out.println("Received: " + st); // SABER DISTO
 					}
 				} else {
-					System.out.println("Received: " + st);
+					System.out.println("Received: " + st); // SABER DISTO
 				}
-				
+
 				s.close();
 				input.close();
 				output.close();
 			} else {
-				System.out.println("UNKNOWN COMMAND");
+				System.err.println("UNKNOWN COMMAND");
 			}
 		}
 
-		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-			public void run() {
-				System.out.println("In shutdown hook");
-				clientSocket.close();
-			}
-		}, "Shutdown-thread"));
+		// ACHO QUE ISTO NAO TAVA A FAZER NADA:
+		// SABER DISTO
+
+		/*
+		 * Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+		 * public void run() { System.out.println("In shutdown hook");
+		 * clientSocket.close(); } }, "Shutdown-thread"));
+		 */
 	}
 
 	public static byte[] readFile(String filename) throws IOException {
@@ -217,10 +211,9 @@ class User {
 			dis.readFully(fileData);
 			dis.close();
 
-			System.out.println("Loaded the file");
 			return fileData;
 		} catch (FileNotFoundException e) {
-			System.err.println("Couldn't find the file");
+			System.err.println("Local file not found");
 			return "nok".getBytes();
 		}
 	}

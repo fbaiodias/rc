@@ -77,11 +77,15 @@ public class StorageServer {
 
 				System.out.println("gonna try to read da file");
 				byte[] fileBytes = readFile(fileName);
+				
+				if (fileBytes == null) {
+					output.writeBytes("REP ERR\n");
+				} else {
+					output.writeBytes("REP ok " + fileBytes.length + " ");
+					output.write(fileBytes);
+					output.writeBytes("\n");
+				}
 
-				System.out.println("gonna send da file nao");
-				output.writeBytes("REP ok " + fileBytes.length + " ");
-				output.write(fileBytes);
-				output.writeBytes("\n");
 			} else if (st.startsWith("UPS")) { // UPS fn size data
 
 				// fileName = fileName.substring(0, fileName.length());
@@ -134,7 +138,8 @@ public class StorageServer {
 			System.err
 					.println("Couldn't find the file. This error was is in the do: "
 							+ e);
-			return "nok".getBytes();
+			//return "nok".getBytes();
+			return null;
 		}
 	}
 }
