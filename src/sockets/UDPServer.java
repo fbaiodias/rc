@@ -49,8 +49,6 @@ public class UDPServer extends Server {
         	resSentence += "\n";
         	
         }
-        
-        System.out.println("UDP RECEIVED: " + sentence);
 
         InetAddress IPAddress = receivePacket.getAddress();
         int port = receivePacket.getPort();
@@ -64,7 +62,6 @@ public class UDPServer extends Server {
       serverSocket.close();
     }
     catch (Exception e) {
-      System.out.println("Failed to start UDP server at port " + PORT);
       System.out.println(e);
     }
   }
